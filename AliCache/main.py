@@ -78,9 +78,9 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
     if policy == "lru":
         # cache is going to look like {"index1": {"tag1": lru_bit1, "tag2":lru_bit2}, "index2": {"tag1": lru_bit1, "tag2":lru_bit2}}
         for address in trace_list:  # address sample [set_index, tag, block_offset]
-            is_index_cached = lookup(address[0], list(cache.keys()))  # is the requested index in cache or not?
+            is_index_cached = lookup(address[0], list(cache.keys()))  # is the requested index in the cache or not?
             if is_index_cached:
-                is_tag_cached = lookup(address[1], list(cache[address[0]].keys()))  # is the requested tag is that cache index or not?
+                is_tag_cached = lookup(address[1], list(cache[address[0]].keys()))  # is the requested tag in the index?
                 # DEBUG_AREA
                 # print(cache[address[0]].keys())
                 if is_tag_cached:
@@ -130,15 +130,14 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
     elif policy == "optimal":
         # print("Optimal cache policy has not been implemented yet.")
         for add_index in range(len(trace_list)):  # address sample [set_index, tag, block_offset]
+            optimal_forward_list = trace_list[add_index:add_index+1000]  # list sample [set_index, tag, block_offset]
             # DEBUG_AREA
             print(trace_list[add_index][0])
-            # is the requested index in cache or not?
-            is_index_cached = lookup(trace_list[add_index][0], list(cache.keys()))
+            is_index_cached = lookup(trace_list[add_index][0], list(cache.keys()))  # is the requested index in the cache or not?
             if is_index_cached:
-                # is the requested tag is that cache index or not?
-                is_tag_cached = lookup(trace_list[add_index][1], list(cache[trace_list[add_index][0]].keys()))
+                is_tag_cached = lookup(trace_list[add_index][1], list(cache[trace_list[add_index][0]].keys()))  # is the requested tag in the index?
                 # DEBUG_AREA
-                # print(cache[address[0]].keys())
+                # print(cache[trace_list[add_index][0]].keys())
                 if is_tag_cached:
                     hit_count += 1
                     # DEBUG_AREA
@@ -196,7 +195,6 @@ def fully_associative(address_list, num_of_blocks, block_size, policy):
 def lookup(address, list_of_indices):
     return True if address in list_of_indices else False
     # must return True (hit) or False (miss).
-
 
 
 path_to_instructions_file = '/home/ali/Desktop/Projects/AliCache/00-L1i'
