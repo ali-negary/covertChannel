@@ -132,11 +132,15 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
     elif policy == "optimal":
         # print("Optimal cache policy has not been implemented yet.")
         for addr_index in range(len(trace_list)):  # address sample [set_index, tag, block_offset]
-            optimal_forward_list = trace_list[addr_index:addr_index + 10000]  # list sample [set_index, tag, block_offset]
-            forward_tag_list = [trace[1] for trace in optimal_forward_list if trace[0] == trace_list[addr_index][0]]  # tags with identical indices
             # DEBUG_AREA
-            if addr_index % 100000 == 0: print(addr_index)
-            # print(optimal_forward_list[:2])
+            # epoch_time = time.time()
+            # forward_tag_list contains tags with identical indices as addr_index
+            # forward_tag_list = [trace[1] for trace in trace_list[addr_index:addr_index + 100000] if trace[0] == trace_list[addr_index][0]]
+            forward_tag_list = [trace[1] for trace in trace_list if trace[0] == trace_list[addr_index][0]]
+            # DEBUG_AREA
+            # if addr_index % 5 == 0: print(addr_index, round(time.time() - epoch_time, 3))
+            # print(forward_tag_list[:5])
+            # break
             # print(trace_list[addr_index][0])
             is_index_cached = lookup(trace_list[addr_index][0], list(cache.keys()))  # is the requested index in the cache or not?
             if is_index_cached:
@@ -158,11 +162,12 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
                         cache[trace_list[addr_index][0]][trace_list[addr_index][1]] = 0
                         # break
                     else:
-                        remove_candidates = cache[trace_list[addr_index][0]].copy()
+                        # remove_candidates = cache[trace_list[addr_index][0]].copy()
                         # DEBUG_AREA
                         # print("an item is going to be removed now:")
                         # print("remove candidates are: ", remove_candidates)
-                        for value in remove_candidates:
+                        # epoch_time = time.time()
+                        for value in cache[trace_list[addr_index][0]]:
                             # DEBUG_AREA
                             # print("value: ", value)
                             if value not in forward_tag_list:
@@ -171,13 +176,15 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
                                 pass
                             else:
                                 # DEBUG_AREA
-                                remove_candidates[value] = forward_tag_list.index(value)
+                                cache[trace_list[addr_index][0]][value] = forward_tag_list.index(value)
                                 # print("index of value in forward list: ", forward_tag_list.index(value))
-                        remove_choice = min(remove_candidates, key=remove_candidates.get)
+                        # if addr_index % 5 == 0: print(addr_index, round(time.time() - epoch_time, 3),"\n")
+                        # remove_choice = min(cache[trace_list[addr_index][0]], key=cache[trace_list[addr_index][0]].get)
                         # DEBUG_AREA
                         # print("cache set before pop", remove_candidates)
                         # print("our choice to be removed: ", remove_choice)
-                        del cache[trace_list[addr_index][0]][remove_choice]
+                        # del cache[trace_list[addr_index][0]][remove_choice]
+                        del cache[trace_list[addr_index][0]][min(cache[trace_list[addr_index][0]], key=cache[trace_list[addr_index][0]].get)]
                         # DEBUG_AREA
                         # print("cache set after pop", cache[trace_list[addr_index][0]])
                         cache[trace_list[addr_index][0]][trace_list[addr_index][1]] = 0
@@ -195,7 +202,7 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
             # time.sleep(0.1)
 
     else:
-        print("Requested policy will not be supported in my code")
+        print("Requested policy will not be supported in my program")
 
     return hit_count, miss_count, pre_process_time
 
@@ -219,4 +226,4 @@ def lookup(address, list_of_indices):
 
 
 path_to_instructions_file = '/home/ali/Desktop/Projects/AliCache/00-L1i'
-chooseCache(path_to_instructions_file, block_size=64, cache_size=32, cache_associativity=2, replacement_policy="lru")
+chooseCache(path_to_instructions_file, block_size=64, cache_size=32, cache_associativity=4, replacement_policy="optimal")
