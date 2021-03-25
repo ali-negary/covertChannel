@@ -109,7 +109,7 @@ def set_associative(address_list, ways, block_size, num_of_sets, policy):
                         # DEBUG_AREA
                         # print("This one: ", lru_key)
                         del cache[address[0]][lru_key]
-                        # baad az inke ino hazf kardi, chizi mizari jash ya na? na, pas ridi :|
+                        cache[address[0]][address[1]] = 0
                         # DEBUG_AREA
                         # print(cache[address[0]])
                         # break
@@ -219,4 +219,4 @@ def lookup(address, list_of_indices):
 
 
 path_to_instructions_file = '/home/ali/Desktop/Projects/AliCache/00-L1i'
-chooseCache(path_to_instructions_file, block_size=64, cache_size=32, cache_associativity=2, replacement_policy="optimal")
+chooseCache(path_to_instructions_file, block_size=64, cache_size=32, cache_associativity=2, replacement_policy="lru")
